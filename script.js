@@ -1,29 +1,8 @@
-/* =========================================
-   C PROGRAMMING DAILY PROGRESS TRACKER
-   ========================================= */
+/* C PROGRAMMING DAILY PROGRESS TRACKER — FIREBASE LIVE VERSION */
 
-
-// ================================
-// MEMBERS
-// ================================
-
-const members = [
-    "Afif",
-    "Saikot",
-    "Tanim",
-    "Tashfia",
-    "Akib",
-    "Bushra",
-    "Lubaba"
-];
-
-
-// ================================
-// ROADMAP
-// ================================
+const members = ["Afif", "Saikot", "Tanim", "Tashfia", "Akib", "Bushra", "Lubaba"];
 
 const roadmap = [
-
     {
         title: "Phase 1 — C Basics",
         topics: [
@@ -37,7 +16,6 @@ const roadmap = [
             "Type Casting"
         ]
     },
-
     {
         title: "Phase 2 — Conditional & Loops",
         topics: [
@@ -53,7 +31,6 @@ const roadmap = [
             "Pattern Printing"
         ]
     },
-
     {
         title: "Phase 3 — Functions",
         topics: [
@@ -62,7 +39,6 @@ const roadmap = [
             "Recursion"
         ]
     },
-
     {
         title: "Phase 4 — Arrays & Strings",
         topics: [
@@ -73,7 +49,6 @@ const roadmap = [
             "String Functions"
         ]
     },
-
     {
         title: "Phase 5 — Algorithms",
         topics: [
@@ -81,7 +56,6 @@ const roadmap = [
             "Sorting"
         ]
     },
-
     {
         title: "Phase 6 — Pointers",
         topics: [
@@ -91,7 +65,6 @@ const roadmap = [
             "Pointers & Functions"
         ]
     },
-
     {
         title: "Phase 7 — Advanced C",
         topics: [
@@ -108,7 +81,6 @@ const roadmap = [
             "Bit Manipulation"
         ]
     },
-
     {
         title: "Phase 8 — Data Structures",
         topics: [
@@ -120,102 +92,88 @@ const roadmap = [
             "Graph"
         ]
     },
-
     {
         title: "Phase 9 — Project",
         topics: [
             "C Project Practice"
         ]
     }
-
 ];
 
 
-// ================================
-// STORAGE
-// ================================
+/* Firebase Console থেকে পাওয়া values এখানে বসাতে হবে */
+const firebaseConfig = {
+    apiKey: "AIzaSyAFGYyVHXQpOcFuQX_2cYcTD4-jIcZenSI",
+    authDomain: "vur-progress-tracker.firebaseapp.com",
+    projectId: "vur-progress-tracker",
+    storageBucket: "vur-progress-tracker.firebasestorage.app",
+    messagingSenderId: "187659926227",
+    appId: "1:187659926227:web:d96981572598c203ba3226"
+};
 
-const savedProgress =
-    JSON.parse(localStorage.getItem("cProgress")) || {};
+/*
+Firebase Authentication-এ এই email দিয়ে user তৈরি করবেন।
+সেই user-এর password-ই হবে আপনার Admin PIN।
+*/
 
-const savedHistory =
-    JSON.parse(localStorage.getItem("cHistory")) || [];
+const ADMIN_EMAIL = "admin@cprogress.app";
 
-const savedToday =
-    localStorage.getItem("todayTopic") || "";
+const STATE_COLLECTION = "tracker";
+const STATE_DOCUMENT = "publicState";
 
 
-// ================================
-// ALL TOPICS
-// ================================
+let savedProgress = {};
+let savedHistory = [];
+let selectedTodayTopic = "";
+let isAdmin = false;
+
+let auth = null;
+let stateRef = null;
+let liveDataReady = false;
+
+
+const connectionStatus =
+    document.getElementById("connectionStatus");
+
+
+function firebaseIsConfigured() {
+
+    return !Object.values(firebaseConfig)
+        .some(value =>
+            String(value).startsWith("PASTE_")
+        );
+
+}
+
+
+function setConnectionStatus(text, type) {
+
+    connectionStatus.textContent = text;
+    connectionStatus.className =
+        `connection-status ${type}`;
+
+}
+
 
 function getAllTopics() {
 
-    let topics = [];
+    return roadmap.flatMap(
+        phase => phase.topics
+    );
 
-    roadmap.forEach(phase => {
-        phase.topics.forEach(topic => {
-            topics.push(topic);
-        });
-    });
-
-    return topics;
 }
 
-
-// ================================
-// UNIQUE KEY
-// ================================
 
 function topicKey(topic, member) {
+
     return `${topic}__${member}`;
-}
-
-
-// ================================
-// SAVE DATA
-// ================================
-
-function saveData() {
-
-    localStorage.setItem(
-        "cProgress",
-        JSON.stringify(savedProgress)
-    );
-
-    localStorage.setItem(
-        "cHistory",
-        JSON.stringify(savedHistory)
-    );
-
-    if (selectedTodayTopic) {
-
-        localStorage.setItem(
-            "todayTopic",
-            selectedTodayTopic
-        );
-
-    }
 
 }
 
-
-// ================================
-// TODAY TOPIC
-// ================================
-
-let selectedTodayTopic = savedToday;
-
-
-// ================================
-// DATE
-// ================================
 
 function getToday() {
 
-    const date = new Date();
-
-    return date.toLocaleDateString(
+    return new Date().toLocaleDateString(
         "en-US",
         {
             weekday: "long",
@@ -227,29 +185,12 @@ function getToday() {
 
 }
 
-document.getElementById("todayDate").textContent =
-    getToday();
+
+document.getElementById("todayDate")
+    .textContent = getToday();
 
 
-// ================================
-// NAVIGATION
-// ================================
-
-const navButtons =
-    document.querySelectorAll(".nav-btn");
-
-navButtons.forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        showSection(
-            button.dataset.section
-        );
-
-    });
-
-});
-
+/* NAVIGATION */
 
 function showSection(sectionName) {
 
@@ -261,15 +202,15 @@ function showSection(sectionName) {
     document.getElementById(sectionName)
         .classList.add("active");
 
+    document.querySelectorAll(".nav-btn")
+        .forEach(button => {
 
-    navButtons.forEach(button => {
+            button.classList.toggle(
+                "active",
+                button.dataset.section === sectionName
+            );
 
-        button.classList.toggle(
-            "active",
-            button.dataset.section === sectionName
-        );
-
-    });
+        });
 
     document.getElementById("navMenu")
         .classList.remove("show");
@@ -279,9 +220,22 @@ function showSection(sectionName) {
 }
 
 
-// ================================
-// MOBILE MENU
-// ================================
+window.showSection = showSection;
+
+
+document.querySelectorAll(".nav-btn")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            showSection(
+                button.dataset.section
+            );
+
+        });
+
+    });
+
 
 document.getElementById("menuBtn")
     .addEventListener("click", () => {
@@ -292,9 +246,7 @@ document.getElementById("menuBtn")
     });
 
 
-// ================================
-// PROGRESS FUNCTIONS
-// ================================
+/* PROGRESS CALCULATION */
 
 function isCompleted(topic, member) {
 
@@ -307,15 +259,10 @@ function isCompleted(topic, member) {
 
 function getTopicProgress(topic) {
 
-    let completed = 0;
-
-    members.forEach(member => {
-
-        if (isCompleted(topic, member)) {
-            completed++;
-        }
-
-    });
+    const completed =
+        members.filter(member =>
+            isCompleted(topic, member)
+        ).length;
 
     return Math.round(
         (completed / members.length) * 100
@@ -328,18 +275,13 @@ function getMemberProgress(member) {
 
     const topics = getAllTopics();
 
-    let completed = 0;
-
-    topics.forEach(topic => {
-
-        if (isCompleted(topic, member)) {
-            completed++;
-        }
-
-    });
+    const completed =
+        topics.filter(topic =>
+            isCompleted(topic, member)
+        ).length;
 
     return {
-        completed,
+        completed: completed,
         total: topics.length,
         percent: Math.round(
             (completed / topics.length) * 100
@@ -367,30 +309,21 @@ function getOverallProgress() {
 
     });
 
-    const total =
-        topics.length * members.length;
-
     return Math.round(
-        (completed / total) * 100
+        (
+            completed /
+            (topics.length * members.length)
+        ) * 100
     );
 
 }
 
 
-// ================================
-// DASHBOARD
-// ================================
+/* DASHBOARD */
 
 function renderDashboard() {
 
     const topics = getAllTopics();
-
-    document.getElementById("totalMembers")
-        .textContent = members.length;
-
-    document.getElementById("totalTopics")
-        .textContent = topics.length;
-
 
     let totalCompleted = 0;
 
@@ -406,15 +339,19 @@ function renderDashboard() {
 
     });
 
+
+    document.getElementById("totalMembers")
+        .textContent = members.length;
+
+    document.getElementById("totalTopics")
+        .textContent = topics.length;
+
     document.getElementById("totalCompleted")
         .textContent = totalCompleted;
 
-
-    const overall =
-        getOverallProgress();
-
     document.getElementById("overallProgress")
-        .textContent = `${overall}%`;
+        .textContent =
+        `${getOverallProgress()}%`;
 
 
     const todayProgress =
@@ -424,31 +361,35 @@ function renderDashboard() {
 
 
     document.getElementById("todayProgressText")
-        .textContent = `${todayProgress}%`;
+        .textContent =
+        `${todayProgress}%`;
 
     document.getElementById("todayProgressBar")
-        .style.width = `${todayProgress}%`;
+        .style.width =
+        `${todayProgress}%`;
 
 
-    const info =
-        document.getElementById("todayTaskInfo");
+    const completedMembers =
+        selectedTodayTopic
+            ? members.filter(member =>
+                isCompleted(
+                    selectedTodayTopic,
+                    member
+                )
+            ).length
+            : 0;
 
 
-    if (selectedTodayTopic) {
-
-        info.innerHTML =
-            `<strong>${selectedTodayTopic}</strong>
-             <br>
-             ${Math.round(
-                 (todayProgress / 100) * members.length
-             )} of ${members.length} members completed`;
-
-    } else {
-
-        info.textContent =
-            "No task selected for today.";
-
-    }
+    document.getElementById("todayTaskInfo")
+        .innerHTML =
+        selectedTodayTopic
+            ? `
+                <strong>${selectedTodayTopic}</strong>
+                <br>
+                ${completedMembers} of
+                ${members.length} members completed
+              `
+            : "No task selected for today.";
 
 
     renderMiniMembers();
@@ -456,148 +397,144 @@ function renderDashboard() {
 }
 
 
-// ================================
-// MINI MEMBER LIST
-// ================================
+/* MINI MEMBERS */
 
 function renderMiniMembers() {
 
     const container =
-        document.getElementById("memberMiniList");
+        document.getElementById(
+            "memberMiniList"
+        );
 
-    container.innerHTML = "";
+    container.innerHTML =
+        members.map(member => {
 
-    members.forEach(member => {
+            const data =
+                getMemberProgress(member);
 
-        const data =
-            getMemberProgress(member);
+            return `
 
-        container.innerHTML += `
+                <div class="member-mini">
 
-            <div class="member-mini">
-
-                <div class="avatar">
-                    ${member.charAt(0)}
-                </div>
-
-                <div class="member-mini-info">
-
-                    <strong>${member}</strong>
-
-                    <div class="mini-progress">
-                        <div
-                            style="width:${data.percent}%">
-                        </div>
+                    <div class="avatar">
+                        ${member.charAt(0)}
                     </div>
 
+                    <div class="member-mini-info">
+
+                        <strong>
+                            ${member}
+                        </strong>
+
+                        <div class="mini-progress">
+
+                            <div style="width:${data.percent}%">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <span>
+                        ${data.percent}%
+                    </span>
+
                 </div>
 
-                <span>
-                    ${data.percent}%
-                </span>
+            `;
 
-            </div>
-
-        `;
-
-    });
+        }).join("");
 
 }
 
 
-// ================================
-// ROADMAP
-// ================================
+/* ROADMAP */
 
 function renderRoadmap() {
 
     const container =
-        document.getElementById("roadmapContainer");
-
-    container.innerHTML = "";
+        document.getElementById(
+            "roadmapContainer"
+        );
 
     let globalNumber = 0;
 
 
-    roadmap.forEach((phase, phaseIndex) => {
+    container.innerHTML =
+        roadmap.map(phase => {
 
-        let phaseCompleted = 0;
-
-        phase.topics.forEach(topic => {
-
-            if (getTopicProgress(topic) === 100) {
-                phaseCompleted++;
-            }
-
-        });
+            const completedTopics =
+                phase.topics.filter(topic =>
+                    getTopicProgress(topic) === 100
+                ).length;
 
 
-        const phasePercent =
-            Math.round(
-                (phaseCompleted /
-                    phase.topics.length) * 100
-            );
+            const phasePercent =
+                Math.round(
+                    (
+                        completedTopics /
+                        phase.topics.length
+                    ) * 100
+                );
 
 
-        let topicsHTML = "";
+            const topicsHTML =
+                phase.topics.map(topic => {
 
-        phase.topics.forEach(topic => {
+                    globalNumber++;
 
-            globalNumber++;
+                    return `
 
-            const progress =
-                getTopicProgress(topic);
+                        <div class="topic">
 
-            topicsHTML += `
+                            <div class="topic-name">
 
-                <div class="topic">
+                                <div class="topic-number">
+                                    ${globalNumber}
+                                </div>
 
-                    <div class="topic-name">
+                                <span>
+                                    ${topic}
+                                </span>
 
-                        <div class="topic-number">
-                            ${globalNumber}
+                            </div>
+
+                            <div class="topic-progress">
+                                ${getTopicProgress(topic)}%
+                            </div>
+
                         </div>
 
+                    `;
+
+                }).join("");
+
+
+            return `
+
+                <div class="phase">
+
+                    <div class="phase-header">
+
+                        <h3>
+                            ${phase.title}
+                        </h3>
+
                         <span>
-                            ${topic}
+                            ${phasePercent}%
                         </span>
 
                     </div>
 
-                    <div class="topic-progress">
-                        ${progress}%
+                    <div class="topic-list">
+                        ${topicsHTML}
                     </div>
 
                 </div>
 
             `;
 
-        });
-
-
-        container.innerHTML += `
-
-            <div class="phase">
-
-                <div class="phase-header">
-
-                    <h3>${phase.title}</h3>
-
-                    <span>
-                        ${phasePercent}%
-                    </span>
-
-                </div>
-
-                <div class="topic-list">
-                    ${topicsHTML}
-                </div>
-
-            </div>
-
-        `;
-
-    });
+        }).join("");
 
 
     document.getElementById("roadmapProgress")
@@ -607,139 +544,139 @@ function renderRoadmap() {
 }
 
 
-// ================================
-// MEMBERS
-// ================================
+/* MEMBERS */
 
 function renderMembers() {
 
     const container =
-        document.getElementById("membersContainer");
-
-    container.innerHTML = "";
-
-    members.forEach(member => {
-
-        const data =
-            getMemberProgress(member);
+        document.getElementById(
+            "membersContainer"
+        );
 
 
-        container.innerHTML += `
+    container.innerHTML =
+        members.map(member => {
 
-            <div class="member-card">
+            const data =
+                getMemberProgress(member);
 
-                <div class="member-card-top">
+            return `
 
-                    <div class="avatar">
-                        ${member.charAt(0)}
+                <div class="member-card">
+
+                    <div class="member-card-top">
+
+                        <div class="avatar">
+                            ${member.charAt(0)}
+                        </div>
+
+                        <div>
+                            <h3>${member}</h3>
+                            <p>C Programming</p>
+                        </div>
+
                     </div>
 
-                    <div>
-                        <h3>${member}</h3>
-                        <p>C Programming</p>
+                    <div class="member-percent">
+                        ${data.percent}%
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div
+                            style="width:${data.percent}%">
+                        </div>
+
+                    </div>
+
+                    <div class="member-stats">
+
+                        <span>
+                            Completed:
+                            ${data.completed}
+                        </span>
+
+                        <span>
+                            Remaining:
+                            ${data.total - data.completed}
+                        </span>
+
                     </div>
 
                 </div>
 
-                <div class="member-percent">
-                    ${data.percent}%
-                </div>
+            `;
 
-                <div class="progress-bar">
-                    <div
-                        style="width:${data.percent}%">
-                    </div>
-                </div>
-
-                <div class="member-stats">
-
-                    <span>
-                        Completed: ${data.completed}
-                    </span>
-
-                    <span>
-                        Remaining:
-                        ${data.total - data.completed}
-                    </span>
-
-                </div>
-
-            </div>
-
-        `;
-
-    });
+        }).join("");
 
 }
 
 
-// ================================
-// CONTROL
-// ================================
+/* ADMIN CONTROL */
 
 function renderControl() {
 
+    document.getElementById(
+        "adminLoginPanel"
+    ).hidden = isAdmin;
+
+    document.getElementById(
+        "adminContent"
+    ).hidden = !isAdmin;
+
+
+    if (!isAdmin) return;
+
+
     const container =
-        document.getElementById("controlContainer");
-
-    container.innerHTML = "";
-
-
-    roadmap.forEach(phase => {
-
-        phase.topics.forEach(topic => {
-
-            const progress =
-                getTopicProgress(topic);
+        document.getElementById(
+            "controlContainer"
+        );
 
 
-            let membersHTML = "";
+    container.innerHTML =
+        getAllTopics().map(topic => {
+
+            const membersHTML =
+                members.map(member => {
+
+                    const checked =
+                        isCompleted(
+                            topic,
+                            member
+                        );
+
+                    return `
+
+                        <label class="control-member">
+
+                            <span class="check-wrap">
+
+                                <input
+                                    type="checkbox"
+                                    ${checked ? "checked" : ""}
+                                    data-topic="${encodeURIComponent(topic)}"
+                                    data-member="${encodeURIComponent(member)}"
+                                >
+
+                                <span>
+                                    ${member}
+                                </span>
+
+                            </span>
+
+                            <span>
+                                ${checked ? "✅" : "⏳"}
+                            </span>
+
+                        </label>
+
+                    `;
+
+                }).join("");
 
 
-            members.forEach(member => {
-
-                const checked =
-                    isCompleted(topic, member)
-                        ? "checked"
-                        : "";
-
-
-                membersHTML += `
-
-                    <label class="control-member">
-
-                        <span class="check-wrap">
-
-                            <input
-                                type="checkbox"
-                                ${checked}
-                                onchange="
-                                    toggleProgress(
-                                        '${topic.replace(/'/g, "\\'")}',
-                                        '${member}',
-                                        this.checked
-                                    )
-                                "
-                            >
-
-                            <span>${member}</span>
-
-                        </span>
-
-                        <span>
-                            ${isCompleted(topic, member)
-                                ? "✅"
-                                : "⏳"}
-                        </span>
-
-                    </label>
-
-                `;
-
-            });
-
-
-            container.innerHTML += `
+            return `
 
                 <div class="control-topic panel">
 
@@ -750,7 +687,8 @@ function renderControl() {
                         </strong>
 
                         <span>
-                            ${progress}% Complete
+                            ${getTopicProgress(topic)}%
+                            Complete
                         </span>
 
                     </div>
@@ -761,40 +699,38 @@ function renderControl() {
 
             `;
 
+        }).join("");
+
+
+    container
+        .querySelectorAll(
+            'input[type="checkbox"]'
+        )
+        .forEach(input => {
+
+            input.addEventListener(
+                "change",
+                () => {
+
+                    toggleProgress(
+                        decodeURIComponent(
+                            input.dataset.topic
+                        ),
+                        decodeURIComponent(
+                            input.dataset.member
+                        ),
+                        input.checked
+                    );
+
+                }
+            );
+
         });
 
-    });
-
 }
 
 
-// ================================
-// TOGGLE PROGRESS
-// ================================
-
-function toggleProgress(
-    topic,
-    member,
-    checked
-) {
-
-    savedProgress[
-        topicKey(topic, member)
-    ] = checked;
-
-
-    saveData();
-
-    updateHistory();
-
-    renderAll();
-
-}
-
-
-// ================================
-// TODAY TOPIC SELECT
-// ================================
+/* TODAY TOPIC SELECT */
 
 function renderTodaySelect() {
 
@@ -803,23 +739,28 @@ function renderTodaySelect() {
             "todayTopicSelect"
         );
 
-    select.innerHTML =
-        `<option value="">
+
+    select.innerHTML = `
+
+        <option value="">
             -- Select Topic --
-        </option>`;
+        </option>
+
+    `;
 
 
     getAllTopics().forEach(topic => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
         option.value = topic;
         option.textContent = topic;
 
-        if (topic === selectedTodayTopic) {
-            option.selected = true;
-        }
+        option.selected =
+            topic === selectedTodayTopic;
 
         select.appendChild(option);
 
@@ -828,56 +769,83 @@ function renderTodaySelect() {
 }
 
 
-document.getElementById("saveTodayBtn")
-    .addEventListener("click", () => {
+/* HISTORY */
 
-        selectedTodayTopic =
-            document.getElementById(
-                "todayTopicSelect"
-            ).value;
+function renderHistory() {
 
-
-        if (!selectedTodayTopic) {
-
-            document.getElementById(
-                "selectedTopicMessage"
-            ).textContent =
-                "Please select a topic.";
-
-            return;
-
-        }
-
-
-        localStorage.setItem(
-            "todayTopic",
-            selectedTodayTopic
+    const container =
+        document.getElementById(
+            "historyContainer"
         );
 
 
-        document.getElementById(
-            "selectedTopicMessage"
-        ).textContent =
-            `Today's topic: ${selectedTodayTopic}`;
+    if (!savedHistory.length) {
+
+        container.innerHTML = `
+
+            <p class="muted">
+                No progress history yet.
+            </p>
+
+        `;
+
+        return;
+
+    }
 
 
-        renderAll();
+    container.innerHTML =
+        [...savedHistory]
+            .reverse()
+            .map(item => `
 
-    });
+                <div class="history-row">
+
+                    <span class="history-date">
+                        ${item.date}
+                    </span>
+
+                    <span class="history-topic">
+                        ${item.topic}
+                    </span>
+
+                    <span class="history-percent">
+                        ${item.percent}%
+                    </span>
+
+                </div>
+
+            `)
+            .join("");
+
+}
 
 
-// ================================
-// HISTORY
-// ================================
+/* RENDER EVERYTHING */
 
-function updateHistory() {
+function renderAll() {
+
+    renderDashboard();
+    renderRoadmap();
+    renderMembers();
+    renderControl();
+    renderTodaySelect();
+    renderHistory();
+
+}
+
+
+/* UPDATE HISTORY */
+
+function updateHistoryInMemory() {
 
     if (!selectedTodayTopic) return;
 
 
     const today =
-        new Date().toISOString()
-        .split("T")[0];
+        new Date()
+            .toISOString()
+            .split("T")[0];
 
 
     const percent =
@@ -905,180 +873,466 @@ function updateHistory() {
         savedHistory.push({
 
             date: today,
-
             topic: selectedTodayTopic,
-
             percent: percent
 
         });
 
     }
 
+}
 
-    saveData();
+
+/* SAVE TO FIREBASE */
+
+async function saveLiveData() {
+
+    if (!isAdmin || !stateRef) {
+
+        throw new Error(
+            "Admin access required."
+        );
+
+    }
+
+
+    await stateRef.set({
+
+        progress: savedProgress,
+        history: savedHistory,
+        todayTopic: selectedTodayTopic,
+
+        updatedAt:
+            firebase.firestore
+                .FieldValue
+                .serverTimestamp()
+
+    }, {
+        merge: true
+    });
 
 }
 
 
-function renderHistory() {
+/* TOGGLE MEMBER PROGRESS */
 
-    const container =
-        document.getElementById(
-            "historyContainer"
+async function toggleProgress(
+    topic,
+    member,
+    checked
+) {
+
+    if (!isAdmin) return;
+
+
+    savedProgress[
+        topicKey(topic, member)
+    ] = checked;
+
+
+    updateHistoryInMemory();
+
+    renderAll();
+
+
+    try {
+
+        await saveLiveData();
+
+    } catch (error) {
+
+        alert(
+            "Progress save হয়নি। Internet connection এবং Firebase Rules check করুন।"
+        );
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* SAVE TODAY'S TOPIC */
+
+document.getElementById("saveTodayBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            if (!isAdmin) return;
+
+
+            const chosenTopic =
+                document.getElementById(
+                    "todayTopicSelect"
+                ).value;
+
+
+            if (!chosenTopic) {
+
+                document.getElementById(
+                    "selectedTopicMessage"
+                ).textContent =
+                    "Please select a topic.";
+
+                return;
+
+            }
+
+
+            selectedTodayTopic =
+                chosenTopic;
+
+
+            document.getElementById(
+                "selectedTopicMessage"
+            ).textContent =
+                `Today's topic: ${selectedTodayTopic}`;
+
+
+            updateHistoryInMemory();
+
+            renderAll();
+
+            await saveLiveData();
+
+        }
+    );
+
+
+/* RESET TODAY */
+
+document.getElementById("resetTodayBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            if (!isAdmin) return;
+
+
+            if (!selectedTodayTopic) {
+
+                alert(
+                    "No topic selected for today."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !confirm(
+                    `Reset progress for "${selectedTodayTopic}"?`
+                )
+            ) {
+                return;
+            }
+
+
+            members.forEach(member => {
+
+                delete savedProgress[
+                    topicKey(
+                        selectedTodayTopic,
+                        member
+                    )
+                ];
+
+            });
+
+
+            updateHistoryInMemory();
+
+            renderAll();
+
+            await saveLiveData();
+
+        }
+    );
+
+
+/* RESET ALL */
+
+document.getElementById("resetAllBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            if (!isAdmin) return;
+
+
+            if (
+                !confirm(
+                    "Are you sure you want to reset ALL progress?"
+                )
+            ) {
+                return;
+            }
+
+
+            savedProgress = {};
+            savedHistory = [];
+            selectedTodayTopic = "";
+
+
+            renderAll();
+
+            await saveLiveData();
+
+        }
+    );
+
+
+/* ADMIN PIN LOGIN */
+
+document.getElementById("adminLoginForm")
+    .addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+
+            const pin =
+                document.getElementById(
+                    "adminPin"
+                ).value;
+
+
+            const message =
+                document.getElementById(
+                    "loginMessage"
+                );
+
+
+            if (!firebaseIsConfigured()) {
+
+                message.textContent =
+                    "প্রথমে script.js-এ Firebase config বসাতে হবে।";
+
+                return;
+
+            }
+
+
+            message.textContent =
+                "Checking PIN…";
+
+
+            try {
+
+                await auth
+                    .signInWithEmailAndPassword(
+                        ADMIN_EMAIL,
+                        pin
+                    );
+
+
+                document.getElementById(
+                    "adminPin"
+                ).value = "";
+
+
+                message.textContent = "";
+
+            } catch (error) {
+
+                message.textContent =
+                    "PIN সঠিক নয়। আবার চেষ্টা করুন।";
+
+                console.error(
+                    error.code
+                );
+
+            }
+
+        }
+    );
+
+
+/* ADMIN LOGOUT */
+
+document.getElementById("logoutBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            if (auth) {
+                auth.signOut();
+            }
+
+        }
+    );
+
+
+/* OLD LOCALSTORAGE DATA MIGRATION */
+
+async function migrateOldLocalDataIfNeeded() {
+
+    const snapshot =
+        await stateRef.get();
+
+
+    if (snapshot.exists) return;
+
+
+    savedProgress =
+        JSON.parse(
+            localStorage.getItem(
+                "cProgress"
+            ) || "{}"
         );
 
 
-    if (savedHistory.length === 0) {
+    savedHistory =
+        JSON.parse(
+            localStorage.getItem(
+                "cHistory"
+            ) || "[]"
+        );
 
-        container.innerHTML =
-            `<p class="muted">
-                No progress history yet.
-            </p>`;
+
+    selectedTodayTopic =
+        localStorage.getItem(
+            "todayTopic"
+        ) || "";
+
+
+    await saveLiveData();
+
+}
+
+
+/* FIREBASE INITIALIZATION */
+
+function initializeFirebase() {
+
+    if (!firebaseIsConfigured()) {
+
+        setConnectionStatus(
+            "Firebase setup required",
+            "offline"
+        );
+
+        renderAll();
 
         return;
 
     }
 
 
-    container.innerHTML = "";
+    firebase.initializeApp(
+        firebaseConfig
+    );
 
 
-    [...savedHistory]
-        .reverse()
-        .forEach(item => {
-
-            container.innerHTML += `
-
-                <div class="history-row">
-
-                    <span class="history-date">
-                        ${item.date}
-                    </span>
-
-                    <span class="history-topic">
-                        ${item.topic}
-                    </span>
-
-                    <span class="history-percent">
-                        ${item.percent}%
-                    </span>
-
-                </div>
-
-            `;
-
-        });
-
-}
+    auth =
+        firebase.auth();
 
 
-// ================================
-// RESET TODAY
-// ================================
+    const db =
+        firebase.firestore();
 
-document.getElementById("resetTodayBtn")
-    .addEventListener("click", () => {
 
-        if (!selectedTodayTopic) {
+    stateRef =
+        db.collection(
+            STATE_COLLECTION
+        ).doc(
+            STATE_DOCUMENT
+        );
 
-            alert(
-                "No topic selected for today."
+
+    /* REAL-TIME DATA LISTENER */
+
+    stateRef.onSnapshot(
+
+        snapshot => {
+
+            if (snapshot.exists) {
+
+                const data =
+                    snapshot.data();
+
+
+                savedProgress =
+                    data.progress || {};
+
+
+                savedHistory =
+                    data.history || [];
+
+
+                selectedTodayTopic =
+                    data.todayTopic || "";
+
+            }
+
+
+            liveDataReady = true;
+
+
+            setConnectionStatus(
+                "Live data connected",
+                "online"
             );
 
-            return;
+
+            renderAll();
+
+        },
+
+        error => {
+
+            setConnectionStatus(
+                "Live connection failed",
+                "offline"
+            );
+
+            console.error(error);
 
         }
 
-
-        const confirmReset =
-            confirm(
-                `Reset progress for "${selectedTodayTopic}"?`
-            );
+    );
 
 
-        if (!confirmReset) return;
+    /* ADMIN LOGIN STATUS */
+
+    auth.onAuthStateChanged(
+        async user => {
+
+            isAdmin =
+                Boolean(
+                    user &&
+                    user.email === ADMIN_EMAIL
+                );
 
 
-        members.forEach(member => {
+            if (isAdmin) {
 
-            delete savedProgress[
-                topicKey(
-                    selectedTodayTopic,
-                    member
-                )
-            ];
+                try {
 
-        });
+                    await migrateOldLocalDataIfNeeded();
 
+                } catch (error) {
 
-        saveData();
+                    console.error(error);
 
-        renderAll();
+                }
 
-    });
+            }
 
 
-// ================================
-// RESET ALL
-// ================================
+            renderAll();
 
-document.getElementById("resetAllBtn")
-    .addEventListener("click", () => {
-
-        const confirmReset =
-            confirm(
-                "Are you sure you want to reset ALL progress?"
-            );
-
-
-        if (!confirmReset) return;
-
-
-        Object.keys(savedProgress)
-            .forEach(key => {
-                delete savedProgress[key];
-            });
-
-
-        savedHistory.length = 0;
-
-        localStorage.removeItem(
-            "todayTopic"
-        );
-
-        selectedTodayTopic = "";
-
-
-        saveData();
-
-        renderAll();
-
-    });
-
-
-// ================================
-// RENDER EVERYTHING
-// ================================
-
-function renderAll() {
-
-    renderDashboard();
-
-    renderRoadmap();
-
-    renderMembers();
-
-    renderControl();
-
-    renderTodaySelect();
-
-    renderHistory();
+        }
+    );
 
 }
 
 
-// ================================
-// INITIAL LOAD
-// ================================
+/* INITIAL LOAD */
 
 renderAll();
+
+initializeFirebase();
