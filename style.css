@@ -24,6 +24,32 @@ body {
     min-height: 100vh;
 }
 
+[hidden] {
+    display: none !important;
+}
+
+.connection-status {
+    width: fit-content;
+    margin: -18px 0 22px auto;
+    padding: 7px 11px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.connection-status.online {
+    color: var(--green);
+    border-color: rgba(34, 197, 94, .35);
+    background: rgba(34, 197, 94, .08);
+}
+
+.connection-status.offline {
+    color: var(--yellow);
+    border-color: rgba(245, 158, 11, .35);
+    background: rgba(245, 158, 11, .08);
+}
+
 
 /* TOPBAR */
 
@@ -475,6 +501,79 @@ nav {
 
 /* CONTROL */
 
+.admin-login {
+    max-width: 440px;
+    margin: 55px auto;
+    padding: 35px;
+    text-align: center;
+}
+
+.admin-lock {
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 18px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: #172235;
+    font-size: 28px;
+}
+
+.admin-login h2 {
+    margin-bottom: 8px;
+}
+
+.admin-login form {
+    display: grid;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.pin-input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #0d1522;
+    color: var(--text);
+    font: inherit;
+    text-align: center;
+    letter-spacing: 5px;
+    outline: none;
+}
+
+.pin-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, .12);
+}
+
+.login-message {
+    min-height: 18px;
+    margin-top: 12px;
+    color: var(--red);
+    font-size: 13px;
+}
+
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logout-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    color: var(--text);
+    border-color: var(--muted);
+}
+
 .control-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -668,6 +767,20 @@ footer span {
 
 @media (max-width: 700px) {
 
+    .connection-status {
+        margin: -10px 0 18px;
+    }
+
+    .admin-login {
+        margin: 25px auto;
+        padding: 25px 18px;
+    }
+
+    .admin-actions {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
     .topbar {
         flex-wrap: wrap;
     }
@@ -772,3 +885,4 @@ footer span {
     }
 
 }
+
