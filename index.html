@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C Programming - Daily Progress</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <span class="brand-icon">C</span>
+        <div>
+            <h1>C Programming</h1>
+            <p>Daily Progress Tracker</p>
+        </div>
+    </div>
+
+    <button id="menuBtn" class="menu-btn">☰</button>
+
+    <nav id="navMenu">
+        <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+        <button class="nav-btn" data-section="roadmap">Roadmap</button>
+        <button class="nav-btn" data-section="members">Members</button>
+        <button class="nav-btn" data-section="history">History</button>
+        <button class="nav-btn" data-section="control">Control</button>
+    </nav>
+</header>
+
+
+<main class="container">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+
+        <div class="welcome">
+            <div>
+                <p class="small-text">WELCOME BACK 👋</p>
+                <h2>Team Progress Dashboard</h2>
+                <p>Manage your team's C Programming learning progress.</p>
+            </div>
+
+            <div class="date-box">
+                <span>Today</span>
+                <strong id="todayDate"></strong>
+            </div>
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div>
+                    <span>Total Members</span>
+                    <h3 id="totalMembers">7</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div>
+                    <span>Total Topics</span>
+                    <h3 id="totalTopics">0</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div>
+                    <span>Completed</span>
+                    <h3 id="totalCompleted">0</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div>
+                    <span>Overall Progress</span>
+                    <h3 id="overallProgress">0%</h3>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-grid">
+
+            <div class="panel">
+                <div class="panel-title">
+                    <h3>Today's Progress</h3>
+                    <span id="todayProgressText">0%</span>
+                </div>
+
+                <div class="progress-bar">
+                    <div id="todayProgressBar"></div>
+                </div>
+
+                <div id="todayTaskInfo" class="task-info">
+                    No task selected for today.
+                </div>
+            </div>
+
+
+            <div class="panel">
+                <div class="panel-title">
+                    <h3>Team Members</h3>
+                    <button class="view-btn" onclick="showSection('members')">
+                        View All
+                    </button>
+                </div>
+
+                <div id="memberMiniList"></div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ROADMAP -->
+    <section id="roadmap" class="section">
+
+        <div class="section-header">
+            <div>
+                <p class="small-text">LEARNING PATH</p>
+                <h2>C Programming Roadmap</h2>
+            </div>
+
+            <div class="roadmap-progress">
+                <strong id="roadmapProgress">0%</strong>
+                <span>Overall</span>
+            </div>
+        </div>
+
+        <div id="roadmapContainer"></div>
+
+    </section>
+
+
+    <!-- MEMBERS -->
+    <section id="members" class="section">
+
+        <div class="section-header">
+            <div>
+                <p class="small-text">TEAM</p>
+                <h2>Member Progress</h2>
+            </div>
+        </div>
+
+        <div id="membersContainer" class="members-grid"></div>
+
+    </section>
+
+
+    <!-- HISTORY -->
+    <section id="history" class="section">
+
+        <div class="section-header">
+            <div>
+                <p class="small-text">TRACK RECORD</p>
+                <h2>Daily History</h2>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div id="historyContainer"></div>
+        </div>
+
+    </section>
+
+
+    <!-- CONTROL -->
+    <section id="control" class="section">
+
+        <div class="section-header">
+            <div>
+                <p class="small-text">ADMIN</p>
+                <h2>Control Panel</h2>
+            </div>
+
+            <span class="admin-badge">🔐 ADMIN MODE</span>
+        </div>
+
+
+        <div class="control-grid">
+
+            <div class="panel">
+                <h3>Select Today's Topic</h3>
+
+                <select id="todayTopicSelect"></select>
+
+                <button id="saveTodayBtn" class="primary-btn">
+                    Save Today's Topic
+                </button>
+
+                <p id="selectedTopicMessage" class="message"></p>
+            </div>
+
+
+            <div class="panel">
+                <h3>Data Management</h3>
+
+                <button id="resetTodayBtn" class="danger-btn">
+                    Reset Today's Progress
+                </button>
+
+                <button id="resetAllBtn" class="danger-outline-btn">
+                    Reset All Progress
+                </button>
+            </div>
+
+        </div>
+
+        <div class="panel control-topic-panel">
+            <div class="panel-title">
+                <div>
+                    <h3>Manage Topic Progress</h3>
+                    <p class="muted">
+                        এখান থেকেই তুমি প্রত্যেক member-এর status control করবে।
+                    </p>
+                </div>
+            </div>
+
+            <div id="controlContainer"></div>
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+    <p>C Programming Daily Progress Tracker</p>
+    <span>Built with HTML • CSS • JavaScript</span>
+</footer>
+
+
+<script src="script.js"></script>
+</body>
+</html>
