@@ -6,20 +6,13 @@
     <title>C Programming - Daily Progress</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
 <header class="topbar">
     <div class="brand">
         <span class="brand-icon">C</span>
-        <div>
-            <h1>C Programming</h1>
-            <p>Daily Progress Tracker</p>
-        </div>
+        <div><h1>C Programming</h1><p>Daily Progress Tracker</p></div>
     </div>
-
-    <button id="menuBtn" class="menu-btn">☰</button>
-
+    <button id="menuBtn" class="menu-btn" aria-label="Open menu">☰</button>
     <nav id="navMenu">
         <button class="nav-btn active" data-section="dashboard">Dashboard</button>
         <button class="nav-btn" data-section="roadmap">Roadmap</button>
@@ -29,215 +22,83 @@
     </nav>
 </header>
 
-
 <main class="container">
+    <div id="connectionStatus" class="connection-status connecting">Connecting to live data…</div>
 
-    <!-- DASHBOARD -->
     <section id="dashboard" class="section active">
-
         <div class="welcome">
-            <div>
-                <p class="small-text">WELCOME BACK 👋</p>
-                <h2>Team Progress Dashboard</h2>
-                <p>Manage your team's C Programming learning progress.</p>
-            </div>
-
-            <div class="date-box">
-                <span>Today</span>
-                <strong id="todayDate"></strong>
-            </div>
+            <div><p class="small-text">WELCOME BACK 👋</p><h2>Team Progress Dashboard</h2><p>Manage your team's C Programming learning progress.</p></div>
+            <div class="date-box"><span>Today</span><strong id="todayDate"></strong></div>
         </div>
-
-
         <div class="stats-grid">
-
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div>
-                    <span>Total Members</span>
-                    <h3 id="totalMembers">7</h3>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">📚</div>
-                <div>
-                    <span>Total Topics</span>
-                    <h3 id="totalTopics">0</h3>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">✅</div>
-                <div>
-                    <span>Completed</span>
-                    <h3 id="totalCompleted">0</h3>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">📊</div>
-                <div>
-                    <span>Overall Progress</span>
-                    <h3 id="overallProgress">0%</h3>
-                </div>
-            </div>
-
+            <div class="stat-card"><div class="stat-icon">👥</div><div><span>Total Members</span><h3 id="totalMembers">7</h3></div></div>
+            <div class="stat-card"><div class="stat-icon">📚</div><div><span>Total Topics</span><h3 id="totalTopics">0</h3></div></div>
+            <div class="stat-card"><div class="stat-icon">✅</div><div><span>Completed</span><h3 id="totalCompleted">0</h3></div></div>
+            <div class="stat-card"><div class="stat-icon">📊</div><div><span>Overall Progress</span><h3 id="overallProgress">0%</h3></div></div>
         </div>
-
-
         <div class="dashboard-grid">
-
             <div class="panel">
-                <div class="panel-title">
-                    <h3>Today's Progress</h3>
-                    <span id="todayProgressText">0%</span>
-                </div>
-
-                <div class="progress-bar">
-                    <div id="todayProgressBar"></div>
-                </div>
-
-                <div id="todayTaskInfo" class="task-info">
-                    No task selected for today.
-                </div>
+                <div class="panel-title"><h3>Today's Progress</h3><span id="todayProgressText">0%</span></div>
+                <div class="progress-bar"><div id="todayProgressBar"></div></div>
+                <div id="todayTaskInfo" class="task-info">No task selected for today.</div>
             </div>
-
-
             <div class="panel">
-                <div class="panel-title">
-                    <h3>Team Members</h3>
-                    <button class="view-btn" onclick="showSection('members')">
-                        View All
-                    </button>
-                </div>
-
+                <div class="panel-title"><h3>Team Members</h3><button class="view-btn" onclick="showSection('members')">View All</button></div>
                 <div id="memberMiniList"></div>
             </div>
-
         </div>
-
     </section>
 
-
-    <!-- ROADMAP -->
     <section id="roadmap" class="section">
-
-        <div class="section-header">
-            <div>
-                <p class="small-text">LEARNING PATH</p>
-                <h2>C Programming Roadmap</h2>
-            </div>
-
-            <div class="roadmap-progress">
-                <strong id="roadmapProgress">0%</strong>
-                <span>Overall</span>
-            </div>
-        </div>
-
+        <div class="section-header"><div><p class="small-text">LEARNING PATH</p><h2>C Programming Roadmap</h2></div><div class="roadmap-progress"><strong id="roadmapProgress">0%</strong><span>Overall</span></div></div>
         <div id="roadmapContainer"></div>
-
     </section>
 
-
-    <!-- MEMBERS -->
     <section id="members" class="section">
-
-        <div class="section-header">
-            <div>
-                <p class="small-text">TEAM</p>
-                <h2>Member Progress</h2>
-            </div>
-        </div>
-
+        <div class="section-header"><div><p class="small-text">TEAM</p><h2>Member Progress</h2></div></div>
         <div id="membersContainer" class="members-grid"></div>
-
     </section>
 
-
-    <!-- HISTORY -->
     <section id="history" class="section">
-
-        <div class="section-header">
-            <div>
-                <p class="small-text">TRACK RECORD</p>
-                <h2>Daily History</h2>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div id="historyContainer"></div>
-        </div>
-
+        <div class="section-header"><div><p class="small-text">TRACK RECORD</p><h2>Daily History</h2></div></div>
+        <div class="panel"><div id="historyContainer"></div></div>
     </section>
 
-
-    <!-- CONTROL -->
     <section id="control" class="section">
-
-        <div class="section-header">
-            <div>
-                <p class="small-text">ADMIN</p>
-                <h2>Control Panel</h2>
-            </div>
-
-            <span class="admin-badge">🔐 ADMIN MODE</span>
+        <div id="adminLoginPanel" class="admin-login panel">
+            <div class="admin-lock">🔐</div>
+            <p class="small-text">ADMIN ACCESS</p>
+            <h2>Enter Admin PIN</h2>
+            <p class="muted">Only the administrator can change team progress.</p>
+            <form id="adminLoginForm">
+                <input id="adminPin" class="pin-input" type="password" inputmode="numeric" autocomplete="current-password" minlength="6" placeholder="Enter your PIN" required>
+                <button class="primary-btn" type="submit">Unlock Control Panel</button>
+            </form>
+            <p id="loginMessage" class="login-message" role="alert"></p>
         </div>
 
-
-        <div class="control-grid">
-
-            <div class="panel">
-                <h3>Select Today's Topic</h3>
-
-                <select id="todayTopicSelect"></select>
-
-                <button id="saveTodayBtn" class="primary-btn">
-                    Save Today's Topic
-                </button>
-
-                <p id="selectedTopicMessage" class="message"></p>
+        <div id="adminContent" class="admin-content" hidden>
+            <div class="section-header">
+                <div><p class="small-text">ADMIN</p><h2>Control Panel</h2></div>
+                <div class="admin-actions"><span class="admin-badge">🔓 ADMIN MODE</span><button id="logoutBtn" class="logout-btn">Log out</button></div>
             </div>
-
-
-            <div class="panel">
-                <h3>Data Management</h3>
-
-                <button id="resetTodayBtn" class="danger-btn">
-                    Reset Today's Progress
-                </button>
-
-                <button id="resetAllBtn" class="danger-outline-btn">
-                    Reset All Progress
-                </button>
+            <div class="control-grid">
+                <div class="panel"><h3>Select Today's Topic</h3><select id="todayTopicSelect"></select><button id="saveTodayBtn" class="primary-btn">Save Today's Topic</button><p id="selectedTopicMessage" class="message"></p></div>
+                <div class="panel"><h3>Data Management</h3><button id="resetTodayBtn" class="danger-btn">Reset Today's Progress</button><button id="resetAllBtn" class="danger-outline-btn">Reset All Progress</button></div>
             </div>
-
+            <div class="panel control-topic-panel">
+                <div class="panel-title"><div><h3>Manage Topic Progress</h3><p class="muted">এখান থেকেই তুমি প্রত্যেক member-এর status control করবে।</p></div></div>
+                <div id="controlContainer"></div>
+            </div>
         </div>
-
-        <div class="panel control-topic-panel">
-            <div class="panel-title">
-                <div>
-                    <h3>Manage Topic Progress</h3>
-                    <p class="muted">
-                        এখান থেকেই তুমি প্রত্যেক member-এর status control করবে।
-                    </p>
-                </div>
-            </div>
-
-            <div id="controlContainer"></div>
-        </div>
-
     </section>
-
 </main>
 
+<footer><p>C Programming Daily Progress Tracker</p><span>Built with HTML • CSS • JavaScript</span></footer>
 
-<footer>
-    <p>C Programming Daily Progress Tracker</p>
-    <span>Built with HTML • CSS • JavaScript</span>
-</footer>
-
-
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
